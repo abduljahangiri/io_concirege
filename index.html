@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intense Oud — AI Wholesale Concierge</title>
+  <meta name="description" content="24/7 AI concierge for Intense Oud wholesale fragrance. Ask about catalog, pricing, logistics, and onboarding.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="chatbot.css">
+
+  <!-- Favicon inline SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23b8902a'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='white' font-family='serif' font-weight='bold'>I</text></svg>">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar">
+    <div class="sb-pattern"></div>
+    <div class="sb-inner">
+
+      <div class="sb-brand">
+        <div class="sb-logo-ring"><span>I</span></div>
+        <div class="sb-brand-text">
+          <h1>Intense Oud</h1>
+          <p>Wholesale Concierge</p>
+        </div>
+      </div>
+
+      <div class="sb-status">
+        <span class="sb-status-dot"></span>
+        AI Concierge Online
+      </div>
+
+      <div class="sb-caps-label">What I Know</div>
+
+      <div class="sb-cap">
+        <div class="sb-cap-icon">📦</div>
+        <div class="sb-cap-text">
+          <strong>Full Catalog</strong>
+          <span>300+ SKUs — ouds, attars, bakhoor, EDPs, gift sets</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">💰</div>
+        <div class="sb-cap-text">
+          <strong>Pricing &amp; MOQs</strong>
+          <span>4-tier wholesale structure, payment terms, thresholds</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🚚</div>
+        <div class="sb-cap-text">
+          <strong>Fulfillment &amp; Logistics</strong>
+          <span>FedEx, UPS, DHL, drop-ship, LTL freight, returns</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🤝</div>
+        <div class="sb-cap-text">
+          <strong>Onboarding Process</strong>
+          <span>6-step process from first call to portal access</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🏆</div>
+        <div class="sb-cap-text">
+          <strong>Success Stories</strong>
+          <span>Real partner results across retail, e-com &amp; distribution</span>
+        </div>
+      </div>
+
+      <div class="sb-topics">
+        <div class="sb-topics-label">Try Asking</div>
+        <button class="sb-topic" data-q="What brands do you carry and what are your best sellers?">
+          What brands do you carry?
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" data-q="What are your minimum order quantities and pricing tiers?">
+          MOQs &amp; pricing tiers
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" data-q="How does your drop-ship program work for e-commerce brands?">
+          Drop-ship for e-commerce
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" data-q="Can you share some success stories from your wholesale partners?">
+          Partner success stories
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" data-q="What makes Intense Oud different from other fragrance wholesalers?">
+          Why Intense Oud?
+          <span class="sb-topic-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="sb-train">
+        <strong>📊 Training Mode Active</strong>
+        Every conversation is logged. Use the Export button to download your session for model fine-tuning.
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ═══════ CHAT PANEL ═══════ -->
+  <main class="chat-panel">
+
+    <!-- Topbar -->
+    <div class="chat-topbar">
+      <div class="ctb-av">I</div>
+      <div class="ctb-info">
+        <h2>Intense Oud AI Concierge</h2>
+        <p>Wholesale intelligence, available 24/7 — powered by Claude</p>
+      </div>
+      <div class="ctb-actions">
+        <button class="ctb-btn" id="btn-clear">
+          <span>🗑</span> <span>Clear</span>
+        </button>
+        <button class="ctb-btn" id="btn-training">
+          📊 <span>Training Data</span>
+        </button>
+        <button class="ctb-btn export" id="btn-export">
+          ⬇ <span>Export JSON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Session info bar -->
+    <div class="session-bar">
+      <span>Session <strong id="session-id">—</strong></span>
+      <div class="session-sep"></div>
+      <span>Messages: <strong id="msg-count">0</strong></span>
+      <div class="session-sep"></div>
+      <span>Started: <strong id="session-time">—</strong></span>
+      <div class="session-sep"></div>
+      <span>Model: <strong>claude-sonnet-4-20250514</strong></span>
+    </div>
+
+    <!-- Messages area -->
+    <div class="messages" id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">🌿</div>
+        <h3>Ahlan wa sahlan.</h3>
+        <p>Ask me anything about Intense Oud wholesale — catalog, pricing, logistics, onboarding, or why we're different. I know it all.</p>
+        <div class="chip-row" style="justify-content:center;margin-top:20px;">
+          <button class="chip" data-q="Tell me about your full catalog and top brands">View catalog</button>
+          <button class="chip" data-q="What are your MOQs and pricing tiers?">Pricing tiers</button>
+          <button class="chip" data-q="How does onboarding work?">Onboarding</button>
+          <button class="chip" data-q="How do you ship and fulfill wholesale orders?">Fulfillment</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          class="input-field"
+          id="inp"
+          rows="1"
+          placeholder="Ask anything about Intense Oud wholesale…"
+        ></textarea>
+        <div class="input-btns">
+          <button class="inp-send" id="send-btn" title="Send message">→</button>
+        </div>
+      </div>
+      <div class="input-footer">
+        <span class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+        <span class="input-counter" id="char-count"></span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════ EXPORT MODAL ═══════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Training Data Export</h3>
+        <p>Download this conversation for model fine-tuning or integration</p>
+      </div>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-tabs">
+        <button class="etab active" data-tab="jsonl">JSONL (Fine-tuning)</button>
+        <button class="etab" data-tab="json">JSON (Raw)</button>
+        <button class="etab" data-tab="txt">Plain Text</button>
+        <button class="etab" data-tab="csv">CSV Log</button>
+      </div>
+      <pre class="export-preview" id="export-preview">— No messages yet —</pre>
+      <div class="export-info">
+        <strong>How to use for fine-tuning:</strong> JSONL format is compatible with Anthropic model training submissions and most LLM fine-tuning pipelines. Each line is one complete system/user/assistant training example. Review for quality before submitting.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-o" id="modal-cancel">Close</button>
+      <button class="btn-g" id="modal-download">⬇ Download File</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="chatbot.js"></script>
+
+</body>
+</html>
