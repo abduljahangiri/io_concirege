@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intense Oud — AI Concierge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root {
+  --cream:     #faf7f0;
+  --cream-2:   #f3ede0;
+  --cream-3:   #e8dfc8;
+  --linen:     #f8f4ec;
+  --white:     #ffffff;
+  --gold:      #b8902a;
+  --gold-2:    #c9a23a;
+  --gold-3:    #ddb84a;
+  --gold-4:    #ecd07a;
+  --gold-bg:   #fdf6e3;
+  --gold-glow: rgba(184,144,42,0.15);
+  --ink:       #18130a;
+  --ink-2:     #382b18;
+  --ink-3:     #6b5535;
+  --muted:     rgba(24,19,10,0.48);
+  --border:    rgba(184,144,42,0.14);
+  --border-2:  rgba(184,144,42,0.28);
+  --border-3:  rgba(184,144,42,0.48);
+  --sh-sm:     0 1px 8px rgba(24,19,10,0.06);
+  --sh-md:     0 4px 24px rgba(24,19,10,0.09);
+  --sh-lg:     0 12px 48px rgba(24,19,10,0.13);
+  --r:         8px;
+  --r-md:      14px;
+  --r-lg:      20px;
+  --r-xl:      28px;
+}
+
+/* ═══════════════════════════════════════
+   RESET
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  background: var(--cream);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+button { cursor: pointer; font-family: 'Inter', sans-serif; border: none; }
+input  { font-family: 'Inter', sans-serif; }
+a { color: inherit; }
+
+/* ═══════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════ */
+@keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+@keyframes scaleIn { from{opacity:0;transform:scale(.94)} to{opacity:1;transform:none} }
+@keyframes pulse   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+@keyframes spin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+@keyframes dotAnim { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
+@keyframes shimmer {
+  0%   { background-position:-200% center }
+  100% { background-position:200% center }
+}
+@keyframes orb {
+  0%,100%{transform:scale(1) rotate(0deg)}
+  50%{transform:scale(1.05) rotate(5deg)}
+}
+@keyframes slideIn {
+  from{opacity:0;transform:translateX(20px)}
+  to{opacity:1;transform:none}
+}
+@keyframes slideInLeft {
+  from{opacity:0;transform:translateX(-20px)}
+  to{opacity:1;transform:none}
+}
+@keyframes glowRing {
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+@keyframes countUp {
+  from{transform:translateY(8px);opacity:0}
+  to{transform:none;opacity:1}
+}
+
+/* ═══════════════════════════════════════
+   LAYOUT — split pane
+═══════════════════════════════════════ */
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: linear-gradient(160deg, var(--linen) 0%, var(--cream-2) 100%);
+  border-right: 1px solid var(--border-2);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn .5s ease both;
+}
+
+/* orb decoration */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, rgba(184,144,42,.08) 0%, transparent 65%);
+  border: 1px solid rgba(184,144,42,.08);
+  right: -160px; bottom: -120px;
+  animation: orb 14s ease-in-out infinite;
+  pointer-events: none;
+}
+.sidebar::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,144,42,.05) 0%, transparent 70%);
+  border: 1px solid rgba(184,144,42,.06);
+  left: -60px; top: 100px;
+  pointer-events: none;
+}
+
+/* dot-grid pattern */
+.sb-pattern {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(184,144,42,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none; z-index: 0;
+}
+
+.sb-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  height: 100%; padding: 28px 24px;
+}
+
+/* brand mark */
+.sb-brand {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 36px;
+  animation: fadeUp .6s .1s both;
+}
+.sb-logo-ring {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--ink-2));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px var(--gold-glow);
+  flex-shrink: 0;
+}
+.sb-logo-ring span {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700;
+  color: #fff;
+}
+.sb-brand-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 500; color: var(--ink);
+  letter-spacing: .04em;
+}
+.sb-brand-text p {
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--gold); font-weight: 600;
+}
+
+/* status pill */
+.sb-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.25);
+  border-radius: 99px; padding: 6px 14px;
+  font-size: 11px; color: #15803d; font-weight: 500;
+  margin-bottom: 32px; width: fit-content;
+  animation: fadeUp .6s .15s both;
+}
+.sb-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+/* capabilities */
+.sb-caps-label {
+  font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+  animation: fadeUp .6s .2s both;
+}
+.sb-caps-label::before { content:''; width:18px; height:1px; background:var(--gold); }
+
+.sb-cap {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 14px; margin-bottom: 6px;
+  background: rgba(255,255,255,.55);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(8px);
+  transition: all .25s;
+  animation: fadeUp .6s both;
+}
+.sb-cap:hover { background: rgba(255,255,255,.8); border-color: var(--border-2); transform: translateX(3px); }
+.sb-cap:nth-child(1){animation-delay:.22s}
+.sb-cap:nth-child(2){animation-delay:.28s}
+.sb-cap:nth-child(3){animation-delay:.34s}
+.sb-cap:nth-child(4){animation-delay:.40s}
+.sb-cap:nth-child(5){animation-delay:.46s}
+
+.sb-cap-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--gold-bg); border: 1px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+  transition: transform .25s;
+}
+.sb-cap:hover .sb-cap-icon { transform: scale(1.1) rotate(-5deg); }
+.sb-cap-text { flex: 1; }
+.sb-cap-text strong { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.sb-cap-text span { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* suggested topics */
+.sb-topics { margin-top: auto; padding-top: 24px; }
+.sb-topics-label {
+  font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sb-topics-label::before { content:''; width:18px; height:1px; background:var(--gold); }
+.sb-topic {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--r);
+  background: transparent; border: 1px solid var(--border);
+  font-size: 12px; color: var(--ink-3); width: 100%;
+  text-align: left; margin-bottom: 6px;
+  transition: all .2s;
+}
+.sb-topic:hover { background: var(--gold-bg); border-color: var(--border-2); color: var(--gold); transform: translateX(3px); }
+.sb-topic-arrow { margin-left: auto; font-size: 11px; color: var(--gold); opacity: 0; transition: opacity .2s; }
+.sb-topic:hover .sb-topic-arrow { opacity: 1; }
+
+/* training banner */
+.sb-train {
+  margin-top: 16px; padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(184,144,42,.08), rgba(184,144,42,.04));
+  border: 1px solid var(--border-2); border-radius: var(--r);
+  font-size: 11px; color: var(--ink-3); line-height: 1.5;
+}
+.sb-train strong { color: var(--gold); font-weight: 600; display: block; margin-bottom: 3px; }
+
+/* ═══════════════════════════════════════
+   MAIN CHAT PANEL
+═══════════════════════════════════════ */
+.chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── CHAT TOPBAR ── */
+.chat-topbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.chat-topbar::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-3), transparent);
+}
+.ctb-av {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--ink-2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: #fff;
+  box-shadow: 0 3px 12px var(--gold-glow); flex-shrink: 0;
+  position: relative;
+}
+.ctb-av::after {
+  content: ''; position: absolute; bottom: 1px; right: 1px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #22c55e; border: 2px solid #fff;
+}
+.ctb-info h2 { font-size: 15px; font-weight: 600; color: var(--ink); }
+.ctb-info p {
+  font-size: 11px; color: var(--muted);
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+}
+.ctb-actions { margin-left: auto; display: flex; gap: 8px; }
+.ctb-btn {
+  height: 34px; padding: 0 14px; border-radius: var(--r);
+  font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  border: 1.5px solid var(--border-2); color: var(--ink-3); background: transparent;
+  transition: all .2s; display: flex; align-items: center; gap: 6px;
+}
+.ctb-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
+.ctb-btn.export { background: var(--gold); color: #fff; border-color: var(--gold); }
+.ctb-btn.export:hover { background: var(--gold-2); }
+
+/* session info bar */
+.session-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 28px; background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+  flex-shrink: 0;
+}
+.session-bar span { display: flex; align-items: center; gap: 5px; }
+.session-bar strong { color: var(--gold); font-weight: 600; }
+.session-sep { width: 1px; height: 12px; background: var(--border-2); }
+
+/* ── MESSAGES AREA ── */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-behavior: smooth;
+}
+.messages::-webkit-scrollbar { width: 3px; }
+.messages::-webkit-scrollbar-thumb { background: var(--border-3); border-radius: 2px; }
+
+/* empty state */
+.empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 40px;
+  color: var(--muted);
+  animation: scaleIn .5s .2s ease both;
+}
+.empty-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--gold-bg); border: 2px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; margin-bottom: 18px;
+  animation: float 4s ease-in-out infinite;
+}
+.empty-state h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 500; color: var(--ink); margin-bottom: 8px;
+}
+.empty-state p { font-size: 13px; line-height: 1.65; max-width: 320px; }
+
+/* message row */
+.msg-row {
+  display: flex;
+  gap: 12px;
+  max-width: 820px;
+}
+.msg-row.user { flex-direction: row-reverse; margin-left: auto; }
+
+.msg-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; margin-top: 2px;
+}
+.msg-av.bot {
+  background: linear-gradient(135deg, var(--gold), var(--ink-2));
+  color: #fff; box-shadow: 0 2px 8px var(--gold-glow);
+}
+.msg-av.user {
+  background: var(--cream-2);
+  border: 1.5px solid var(--border-2); color: var(--gold);
+}
+
+.msg-content { flex: 1; max-width: 680px; }
+
+.msg-meta {
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+}
+.msg-row.user .msg-meta { flex-direction: row-reverse; }
+.msg-meta-time { font-size: 9px; }
+
+.msg-bub {
+  padding: 14px 18px;
+  font-size: 14px; line-height: 1.65;
+  border-radius: var(--r);
+}
+.msg-row.bot .msg-bub {
+  background: var(--white); color: var(--ink);
+  border: 1.5px solid var(--border);
+  border-radius: 2px 18px 18px 18px;
+  box-shadow: var(--sh-sm);
+  animation: slideInLeft .3s ease both;
+}
+.msg-row.user .msg-bub {
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  color: #fff; font-weight: 400;
+  border-radius: 18px 2px 18px 18px;
+  box-shadow: 0 4px 16px rgba(184,144,42,.3);
+  animation: slideIn .3s ease both;
+}
+.msg-bub strong { font-weight: 600; }
+.msg-row.bot .msg-bub strong { color: var(--ink); }
+
+/* action row below bot messages */
+.msg-actions {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 6px; opacity: 0; transition: opacity .2s;
+}
+.msg-row:hover .msg-actions { opacity: 1; }
+.msg-act {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); background: transparent; border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 99px; transition: all .2s;
+}
+.msg-act:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
+
+/* chips */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip {
+  background: var(--white); border: 1.5px solid var(--border-2);
+  color: var(--gold); font-size: 12px; font-weight: 500;
+  padding: 8px 16px; border-radius: 999px;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+  box-shadow: var(--sh-sm);
+}
+.chip:hover {
+  background: var(--gold); color: #fff; border-color: var(--gold);
+  transform: translateY(-2px); box-shadow: 0 4px 14px rgba(184,144,42,.35);
+}
+.chip:disabled { opacity: .4; transform: none; cursor: default; pointer-events: none; }
+
+/* typing indicator */
+.typing-row { display: flex; gap: 12px; }
+.typing-bub {
+  padding: 14px 18px; background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 2px 18px 18px 18px;
+  box-shadow: var(--sh-sm);
+  display: flex; align-items: center; gap: 5px;
+}
+.typing-bub span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold-3); animation: dotAnim 1.4s ease infinite; opacity: .35;
+}
+.typing-bub span:nth-child(2){ animation-delay:.22s }
+.typing-bub span:nth-child(3){ animation-delay:.44s }
+
+/* ── DATE DIVIDER ── */
+.date-div {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--muted); margin: 8px 0;
+}
+.date-div::before,.date-div::after {
+  content:''; flex:1; height:1px;
+  background: linear-gradient(to right, transparent, var(--border-2), transparent);
+}
+
+/* ── INPUT AREA ── */
+.input-area {
+  flex-shrink: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 16px 28px 20px;
+  position: relative;
+}
+.input-area::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-3), transparent);
+}
+
+.input-wrap {
+  display: flex; align-items: flex-end; gap: 10px;
+  background: var(--cream);
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--r-xl);
+  padding: 10px 12px 10px 18px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.input-wrap:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px var(--gold-glow);
+}
+.input-field {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; color: var(--ink); resize: none;
+  max-height: 120px; min-height: 24px;
+  line-height: 1.5; padding: 4px 0;
+  font-family: 'Inter', sans-serif;
+}
+.input-field::placeholder { color: var(--muted); }
+.input-btns { display: flex; align-items: flex-end; gap: 6px; }
+.inp-icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: transparent; border: 1.5px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--muted); transition: all .2s;
+}
+.inp-icon:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
+.inp-send {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  border: none; color: #fff; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 12px rgba(184,144,42,.4);
+  transition: transform .2s, box-shadow .2s;
+}
+.inp-send:hover { transform: scale(1.1) rotate(8deg); box-shadow: 0 6px 20px rgba(184,144,42,.5); }
+.inp-send:active { transform: scale(.97); }
+
+.input-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px;
+}
+.input-hint {
+  font-size: 10px; color: var(--muted); letter-spacing: .04em;
+}
+.input-hint kbd {
+  background: var(--cream-2); border: 1px solid var(--border-2);
+  border-radius: 4px; padding: 1px 5px; font-size: 9px;
+  font-family: 'Inter', sans-serif;
+}
+.input-counter { font-size: 10px; color: var(--muted); }
+
+/* ═══════════════════════════════════════
+   EXPORT / TRAINING MODAL
+═══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(24,19,10,.5);
+  backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; animation: fadeIn .2s ease both; }
+.modal {
+  background: var(--white);
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 680px;
+  max-height: 85vh;
+  display: flex; flex-direction: column;
+  box-shadow: var(--sh-lg);
+  animation: scaleIn .25s ease both;
+}
+.modal-head {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-head h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 500; color: var(--ink); margin-bottom: 4px;
+}
+.modal-head p { font-size: 13px; color: var(--muted); }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--cream-2); border: 1px solid var(--border-2);
+  color: var(--ink-3); font-size: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.modal-close:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+.modal-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+.modal-body::-webkit-scrollbar { width: 3px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border-3); }
+
+.export-tabs {
+  display: flex; gap: 4px; margin-bottom: 20px;
+  background: var(--cream); border-radius: var(--r); padding: 4px;
+  border: 1px solid var(--border);
+}
+.etab {
+  flex: 1; padding: 8px 12px; border-radius: calc(var(--r) - 2px);
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  background: transparent; color: var(--muted); border: none;
+  transition: all .2s;
+}
+.etab.active { background: var(--white); color: var(--gold); box-shadow: var(--sh-sm); }
+
+.export-preview {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px;
+  font-size: 12px;
+  font-family: 'Inter', monospace;
+  line-height: 1.65;
+  color: var(--ink-2);
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.export-preview::-webkit-scrollbar { width: 3px; }
+.export-preview::-webkit-scrollbar-thumb { background: var(--border-3); }
+
+.export-info {
+  background: var(--gold-bg); border: 1px solid var(--border-2);
+  border-radius: var(--r); padding: 14px 16px;
+  font-size: 12px; color: var(--ink-3); line-height: 1.6;
+  margin-top: 16px;
+}
+.export-info strong { color: var(--gold); }
+
+.modal-foot {
+  padding: 18px 28px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+.btn-g {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--gold); color: #fff;
+  font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+  padding: 12px 24px; border: none; border-radius: var(--r);
+  position: relative; overflow: hidden; transition: all .2s;
+  box-shadow: 0 3px 14px rgba(184,144,42,.3);
+}
+.btn-g::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%);
+  transform:translateX(-100%); transition:transform .5s;
+}
+.btn-g:hover::before { transform:translateX(100%); }
+.btn-g:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(184,144,42,.4); }
+.btn-o {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent; color: var(--ink-3);
+  font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase;
+  padding: 12px 24px; border: 1.5px solid var(--border-2); border-radius: var(--r);
+  transition: all .2s;
+}
+.btn-o:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ═══════════════════════════════════════
+   MOBILE RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:768px){
+  .sidebar { display: none; }
+  .chat-topbar { padding: 14px 16px; }
+  .messages { padding: 16px; }
+  .input-area { padding: 12px 16px 16px; }
+  .ctb-btn span { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar">
+    <div class="sb-pattern"></div>
+    <div class="sb-inner">
+
+      <div class="sb-brand">
+        <div class="sb-logo-ring"><span>I</span></div>
+        <div class="sb-brand-text">
+          <h1>Intense Oud</h1>
+          <p>Wholesale Concierge</p>
+        </div>
+      </div>
+
+      <div class="sb-status">
+        <span class="sb-status-dot"></span>
+        AI Concierge Online
+      </div>
+
+      <div class="sb-caps-label">What I Know</div>
+
+      <div class="sb-cap">
+        <div class="sb-cap-icon">📦</div>
+        <div class="sb-cap-text">
+          <strong>Full Catalog</strong>
+          <span>300+ SKUs — ouds, attars, bakhoor, EDPs, gift sets</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">💰</div>
+        <div class="sb-cap-text">
+          <strong>Pricing & MOQs</strong>
+          <span>4-tier wholesale structure, payment terms, thresholds</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🚚</div>
+        <div class="sb-cap-text">
+          <strong>Fulfillment & Logistics</strong>
+          <span>FedEx, UPS, DHL, drop-ship, LTL freight, returns</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🤝</div>
+        <div class="sb-cap-text">
+          <strong>Onboarding Process</strong>
+          <span>6-step process from first call to portal access</span>
+        </div>
+      </div>
+      <div class="sb-cap">
+        <div class="sb-cap-icon">🏆</div>
+        <div class="sb-cap-text">
+          <strong>Success Stories</strong>
+          <span>Real partner results across retail, e-com & distribution</span>
+        </div>
+      </div>
+
+      <div class="sb-topics">
+        <div class="sb-topics-label">Try Asking</div>
+        <button class="sb-topic" onclick="injectQ('What brands do you carry and what are your best sellers?')">
+          What brands do you carry?
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" onclick="injectQ('What are your minimum order quantities and pricing tiers?')">
+          MOQs &amp; pricing tiers
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" onclick="injectQ('How does your drop-ship program work for e-commerce brands?')">
+          Drop-ship for e-commerce
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" onclick="injectQ('Can you share some success stories from your wholesale partners?')">
+          Partner success stories
+          <span class="sb-topic-arrow">→</span>
+        </button>
+        <button class="sb-topic" onclick="injectQ('What makes Intense Oud different from other fragrance wholesalers?')">
+          Why Intense Oud?
+          <span class="sb-topic-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="sb-train">
+        <strong>📊 Training Mode Active</strong>
+        Every conversation is logged. Use the Export button to download your session for model fine-tuning.
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ═══════ CHAT PANEL ═══════ -->
+  <main class="chat-panel">
+
+    <!-- Topbar -->
+    <div class="chat-topbar">
+      <div class="ctb-av">I</div>
+      <div class="ctb-info">
+        <h2>Intense Oud AI Concierge</h2>
+        <p>Wholesale intelligence, available 24/7 — powered by Claude</p>
+      </div>
+      <div class="ctb-actions">
+        <button class="ctb-btn" onclick="clearChat()">
+          <span>🗑</span> <span>Clear</span>
+        </button>
+        <button class="ctb-btn" onclick="openModal()">
+          📊 <span>Training Data</span>
+        </button>
+        <button class="ctb-btn export" onclick="quickExport()">
+          ⬇ <span>Export JSON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Session info -->
+    <div class="session-bar" id="session-bar">
+      <span>Session <strong id="session-id">—</strong></span>
+      <div class="session-sep"></div>
+      <span>Messages: <strong id="msg-count">0</strong></span>
+      <div class="session-sep"></div>
+      <span>Started: <strong id="session-time">—</strong></span>
+      <div class="session-sep"></div>
+      <span id="model-label">Model: <strong>claude-sonnet-4-20250514</strong></span>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">🌿</div>
+        <h3>Ahlan wa sahlan.</h3>
+        <p>Ask me anything about Intense Oud wholesale — catalog, pricing, logistics, onboarding, or why we're different. I know it all.</p>
+        <div class="chip-row" style="justify-content:center;margin-top:20px;">
+          <button class="chip" onclick="injectQ('Tell me about your full catalog and top brands')">View catalog</button>
+          <button class="chip" onclick="injectQ('What are your MOQs and pricing tiers?')">Pricing tiers</button>
+          <button class="chip" onclick="injectQ('How does onboarding work?')">Onboarding</button>
+          <button class="chip" onclick="injectQ('How do you ship and fulfill wholesale orders?')">Fulfillment</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          class="input-field"
+          id="inp"
+          rows="1"
+          placeholder="Ask anything about Intense Oud wholesale…"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <div class="input-btns">
+          <button class="inp-icon" title="Attach file" onclick="alert('File attachment coming soon')">📎</button>
+          <button class="inp-send" id="send-btn" onclick="sendMsg()" title="Send message">→</button>
+        </div>
+      </div>
+      <div class="input-footer">
+        <span class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+        <span class="input-counter" id="char-count"></span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════ EXPORT / TRAINING MODAL ═══════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Training Data Export</h3>
+        <p>Download this conversation for model fine-tuning or integration</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-tabs">
+        <button class="etab active" onclick="switchTab('jsonl')">JSONL (Fine-tuning)</button>
+        <button class="etab" onclick="switchTab('json')">JSON (Raw)</button>
+        <button class="etab" onclick="switchTab('txt')">Plain Text</button>
+        <button class="etab" onclick="switchTab('csv')">CSV Log</button>
+      </div>
+      <pre class="export-preview" id="export-preview">— No messages yet —</pre>
+      <div class="export-info">
+        <strong>How to use for fine-tuning:</strong> The JSONL format is compatible with OpenAI fine-tuning, Anthropic model training submissions, and most LLM training pipelines. Each line is one complete conversation turn pair formatted as a training example. Download and review for quality before submitting.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-o" onclick="closeModal()">Close</button>
+      <button class="btn-g" onclick="downloadExport()">⬇ Download File</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   SYSTEM PROMPT — Intense Oud Knowledge Base
+═══════════════════════════════════════ */
+var SYSTEM = `You are the official AI Concierge for Intense Oud Wholesale, a premium Middle Eastern fragrance wholesale brand headquartered in Chicago, Illinois, USA. You are warm, knowledgeable, confident, and professional — like a senior member of the Intense Oud sales team who genuinely cares about helping wholesale partners succeed.
+
+Your tone: Premium but approachable. Never robotic. Speak like a trusted advisor. Keep responses focused and readable — use clear paragraphs. For detailed breakdowns, use bold headers to organize information. Never use bullet symbols (•, -, *) as list starters — write in flowing prose or use bold labels followed by colons.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABOUT INTENSE OUD & THE INTENSE BEAUTÉ GROUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Intense Oud is the flagship brand of the Intense Beauté Group, founded by Abdul Karim Ahmed. It is the leading Middle Eastern perfume wholesale operation in the United States, based in Chicago, Illinois. The brand bridges traditional Eastern fragrance culture — oud, attar, bakhoor, mukhallat — with modern Western retail aesthetics. The Experience Center is located in Chicago and serves as both a showroom and launch hub for new drops.
+
+The Intense Beauté Group operates several interconnected brands:
+
+Intense Oud is the crown jewel — premium Middle Eastern fragrance wholesale for the US market.
+
+Intense Elite is a fusion perfume line blending Eastern and Western scent profiles, positioned as accessible luxury. Available exclusively to Tier 2+ wholesale accounts.
+
+Intense Bazaar is an e-commerce brand featuring curated South Asian and Middle Eastern lifestyle products.
+
+Intense Delish is a specialty food and hospitality brand within the ecosystem.
+
+Intense Media is the content and marketing arm producing The Intense Show — a video and audio podcast hosted by Abdul Karim Ahmed and Aamna Hassan. It has three segments: The Intense Podcast (business and culture conversations), Intense Explore (travel and sourcing content), and Intense Exchange (wholesale and industry insights). The show actively builds consumer demand for the brands we carry.
+
+IntenseOud Wholesale is focused specifically on B2B distribution of Middle Eastern fragrances across North and South America.
+
+The Intense Wall is a dynamic live interactive display screen at the Experience Center, connected to intensewall.com, designed to broadcast live events and stream content across future locations.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CATALOG — BRANDS & CATEGORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Intense Oud carries 300+ fragrance SKUs sourced directly from premium suppliers in the UAE, Kingdom of Saudi Arabia (KSA), Kuwait, and Oman.
+
+**Oud Oils & Attars:** Pure oud oils from Assam (India), Cambodia, and the Arabian Peninsula. Attars including rose, musk, amber, and sandalwood blends. These are our highest-margin SKUs with the strongest diaspora demand. Retail markup typically 120–200%.
+
+**Bakhoor & Incense:** Traditional Arabian bakhoor chips and cones for home fragrance retail. Sourced from KSA and UAE. Extremely high reorder frequency — customers who discover bakhoor always come back.
+
+**Mukhallat Blends:** Complex blended Arabic perfume oils — layered, long-lasting, unisex. Very popular with South Asian and Arab-American consumers. Strong gifting category.
+
+**Eau de Parfums (EDPs):** Western-style spray fragrances featuring oud, amber, and musk bases. Includes Intense Elite branded EDPs and third-party sourced lines. These bridge traditional customers and new fragrance consumers.
+
+**Gift Sets & Seasonal Bundles:** Curated sets for Ramadan, Eid, Diwali, and the holiday season. Our fastest-moving wholesale bundles with predictable seasonal demand spikes that you can plan inventory around.
+
+**Home Fragrance:** Reed diffusers, room sprays, and incense burners with oud and amber profiles. Growing retail category, strong in lifestyle and boutique stores.
+
+**Personal Care:** Oud-infused body oils, hair oils, and soaps. A rapidly expanding category, especially in South Asian markets.
+
+**Top Brands Carried:** Ajmal, Swiss Arabian, Ard Al Zaafaran, Al Haramain, Rasasi, Lattafa, Nabeel, Afnan, and several Intense-exclusive private label lines.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHOLESALE PRICING & TIER STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**Tier 1 — Boutique Retail:** Minimum order $500. Standard wholesale pricing — typically 40–55% below suggested retail price. No per-SKU minimums on most lines. Ideal for stores carrying 20–60 SKUs. Perfect entry point for boutiques, beauty shops, and lifestyle stores new to Middle Eastern fragrance.
+
+**Tier 2 — Active Retailer:** Minimum $1,500/month. Better pricing structure, priority access on new product drops, and exclusive access to seasonal bundle pricing. Qualifies for drop-ship program.
+
+**Tier 3 — Volume Distributor:** Minimum $5,000/order. Best pricing across all categories, a dedicated account manager, first-look access to new inventory before it goes live, and co-marketing support including social media assets and product photography.
+
+**Tier 4 — Strategic Partner:** Custom pricing and custom terms. Designed for regional distributors, national chains, or exclusive territory arrangements. Requires a direct conversation with Abdul Karim Ahmed. These deals include exclusivity options, private label, and joint marketing programs.
+
+Accounts start at Tier 1 and graduate based on 90-day volume. No exclusivity is required at Tier 1 or Tier 2. Payment terms: prepay or 50% deposit for new accounts; Net-30 available for established accounts with a track record.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ORDER FULFILLMENT & LOGISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**Warehouse:** All inventory is held at our Chicago fulfillment center. We maintain over $500,000 in live inventory at any given time. Everything is US customs-cleared and retail-ready.
+
+**Domestic Shipping:** Orders ship within 1–2 business days of payment confirmation. Delivery is 2–5 business days across the continental US. Expedited 1–2 day shipping available at additional cost.
+
+**Logistics Partners:** FedEx is our primary domestic carrier. UPS handles secondary domestic and international shipments. DHL is used for international specialty shipments. FreightQuote manages LTL freight for pallet orders.
+
+**International Shipping:** We fulfill to Canada, the United Kingdom, UAE (for re-export), and select additional markets. International lead times are 5–10 business days. Full customs documentation provided at no extra charge.
+
+**Drop Shipping:** Available for Tier 2+ accounts. We ship directly to your end customers with your store's packing slip. White-label packaging available on request. This program is especially popular with e-commerce brands who want to sell without holding inventory.
+
+**LTL Freight:** Pallet orders (typically $10,000+) ship via LTL through our freight brokerage network. We coordinate the freight pickup, documentation, and delivery scheduling.
+
+**Returns & Damages:** Damaged-in-transit claims are accepted within 7 business days of delivery with photo documentation. We replace or issue credit. We do not accept returns on opened fragrance products due to the nature of the goods — quality is inspected before every shipment.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ONBOARDING PROCESS — 6 STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**Step 1 — Discovery Call (30 minutes):** Meet your dedicated account rep. We map your business model, customer demographics, volume goals, and product preferences. This shapes everything that follows.
+
+**Step 2 — Curated Catalog & Proposal (within 24 hours):** You receive a tailored catalog excerpt, your pricing tier assignment, a suggested starter bundle, and an account setup guide specific to your business type and region.
+
+**Step 3 — Sample Order (optional):** New accounts can request a sample pack — typically $150 to $300 depending on categories. This lets you experience the product quality and scent profiles before committing to a full opening order. Many of our best long-term partners started with a sample order.
+
+**Step 4 — Account Agreement:** A simple one-page digital wholesale agreement. No exclusivity required at Tier 1 or Tier 2. Signed in minutes via DocuSign.
+
+**Step 5 — First Order & Portal Access:** Place your opening order and receive immediate access to the Intense Oud Wholesale Portal — a private dashboard with live inventory tracking, order history, new arrivals feed, and one-click reorder functionality.
+
+**Step 6 — Ongoing Support:** Your rep checks in monthly. You receive marketing assets, professional product photography, scent descriptions in English and Arabic, and social media campaign content you can use directly in your store's marketing.
+
+Most accounts are fully onboarded and receiving their first shipment within 48–72 hours of the discovery call. The fastest we've done is 18 hours from first conversation to shipped order.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHOLESALE PORTAL FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The Intense Oud Wholesale Portal is a private digital platform available to all active accounts. It includes: live inventory dashboard with real-time stock levels, one-click reorder on previous orders, new arrivals and seasonal drop notifications, downloadable product photography and marketing copy in multiple formats, order tracking and delivery status, invoice history and account statements, exclusive pre-release product access before public wholesale launch, and direct messaging with your account rep.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUCCESS STORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**Chicago Boutique — Wicker Park:** A lifestyle boutique with zero prior fragrance experience added an Intense Oud curated shelf of 18 SKUs. Within 90 days, fragrance became their #2 revenue category, behind only apparel. They reordered 3 times in Q1. The owner told us it was the easiest new category she'd ever launched.
+
+**Texas Beauty Supply Group — Dallas:** A multi-store operator joined as a Tier 3 distributor. Opening order was $12,000 across 6 locations. They now move $40,000+ per month and use our drop-ship program to fulfill their online store without touching inventory. In 18 months they've become one of our top 5 US accounts.
+
+**NYC South Asian Market — Jackson Heights, Queens:** This retailer stocked our Ramadan gift sets and Eid bundles for the first time. They sold through 200 units in 11 days during Ramadan. Sold out before the holiday ended. Now a Tier 2 account with a dedicated seasonal allocation — we reserve their inventory 60 days in advance.
+
+**Michigan E-Commerce Brand:** A home fragrance brand added Intense Oud white-label oud oils to their product line under their own brand name. Our drop-ship program handles all fulfillment. They scaled from $800/month to $8,000/month in 6 months. Zero inventory risk. Zero warehouse cost.
+
+**Pattern:** Accounts that follow our starter bundle recommendation and use our provided marketing assets consistently sell through within 30–45 days and become long-term partners. The ones who don't follow the recommendation take 60–90 days to find their feet. We always recommend starting with what works.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHY INTENSE OUD IS DIFFERENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**Direct sourcing, not brokering.** We source directly from manufacturers and distilleries in the UAE, KSA, Oman, and Kuwait. We cut out the import layer that most US fragrance wholesalers operate through. This means lower prices for you and full traceability for us.
+
+**US-compliant, retail-ready inventory.** Everything is customs-cleared, safety-documented, and ready to go on shelf. No surprise duty holds. No relabeling required for US retail.
+
+**We understand the consumer.** Most fragrance wholesalers can't tell you the difference between a Mukhallat and an EDP, or why Ajmal outsells Swiss Arabian in zip codes with higher South Indian population density. We can. We help you merchandise based on your specific customer base.
+
+**Marketing support is included — not an upsell.** We provide professional product photography, Arabic and English scent descriptions, Instagram-ready campaign content, and Ramadan/Eid campaign assets to all active accounts at no charge. You don't need an agency.
+
+**The Intense Show drives consumer demand.** Our podcast and video content on YouTube and social media actively builds consumer awareness for the brands we carry. Consumers come into your store already knowing the brands. We're doing your pre-selling for you.
+
+**Relationship-first operations.** You get a named account rep, a direct WhatsApp number, and a founder who is personally reachable for strategic accounts. This is a partnership, not a transaction.
+
+**Exclusive products for higher-tier accounts.** Tier 2+ accounts get access to the Intense Elite EDP line and our private label oud oil program — products your competitors cannot source from any other wholesale supplier in the US.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT & ESCALATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Discovery Call: Book via the booking module on the website.
+WhatsApp: Direct line — responses within 1 hour during business hours (Mon–Fri, 9am–5pm CST).
+Email: wholesale@intenseoud.com
+Location: Chicago, Illinois. Experience Center visits by appointment.
+
+If someone asks to be connected to a human, see specific product pricing per unit, or wants to negotiate territory exclusivity, always direct them to book a Discovery Call or reach out on WhatsApp. Do not provide specific per-unit cost prices in the chat — those are handled in the pricing conversation. If you genuinely don't know something, say so honestly and offer to connect them with the team.`;
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+var history = [];
+var sessionId = 'IO-' + Date.now().toString(36).toUpperCase();
+var sessionStart = new Date();
+var msgCount = 0;
+var currentTab = 'jsonl';
+var isTyping = false;
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+document.getElementById('session-id').textContent = sessionId;
+document.getElementById('session-time').textContent = sessionStart.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+/* char counter */
+document.getElementById('inp').addEventListener('input', function(){
+  var n = this.value.length;
+  document.getElementById('char-count').textContent = n > 0 ? n + ' chars' : '';
+});
+
+/* ═══════════════════════════════════════
+   SEND MESSAGE
+═══════════════════════════════════════ */
+function handleKey(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
+}
+
+function autoResize(el){
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function sendMsg(){
+  var inp = document.getElementById('inp');
+  var text = inp.value.trim();
+  if(!text || isTyping) return;
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('char-count').textContent = '';
+  doSend(text);
+}
+
+function injectQ(text){
+  doSend(text);
+}
+
+function doSend(text){
+  hideEmpty();
+  addUserMsg(text);
+  history.push({role:'user', content: text});
+  msgCount++;
+  updateCount();
+  showTyping();
+  callClaude(text);
+}
+
+function callClaude(text){
+  isTyping = true;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1200,
+      system: SYSTEM,
+      messages: history
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    removeTyping();
+    isTyping = false;
+    var reply = (d.content && d.content[0] && d.content[0].text)
+      ? d.content[0].text
+      : "I'm having a moment — please reach out via WhatsApp or book a call and our team will get back to you right away.";
+    history.push({role:'assistant', content: reply});
+    msgCount++;
+    updateCount();
+    addBotMsg(reply);
+  })
+  .catch(function(err){
+    removeTyping();
+    isTyping = false;
+    addBotMsg("Something went wrong on my end. Please reach out to our team directly at wholesale@intenseoud.com or on WhatsApp — we typically respond within the hour.");
+  });
+}
+
+/* ═══════════════════════════════════════
+   DOM HELPERS
+═══════════════════════════════════════ */
+function hideEmpty(){
+  var e = document.getElementById('empty-state');
+  if(e) e.style.display = 'none';
+}
+
+function updateCount(){
+  document.getElementById('msg-count').textContent = msgCount;
+}
+
+function nowTime(){
+  return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+
+function addUserMsg(text){
+  var msgs = document.getElementById('messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML =
+    '<div class="msg-content">' +
+      '<div class="msg-meta"><span>You</span><span class="msg-meta-time">'+nowTime()+'</span></div>' +
+      '<div class="msg-bub">'+esc(text)+'</div>' +
+    '</div>' +
+    '<div class="msg-av user">U</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addBotMsg(text){
+  var msgs = document.getElementById('messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row bot';
+
+  var formatted = fmt(text);
+
+  row.innerHTML =
+    '<div class="msg-av bot">I</div>' +
+    '<div class="msg-content">' +
+      '<div class="msg-meta"><span>Intense Concierge</span><span class="msg-meta-time">'+nowTime()+'</span></div>' +
+      '<div class="msg-bub">'+formatted+'</div>' +
+      '<div class="msg-actions">' +
+        '<button class="msg-act" onclick="copyMsg(this)">Copy</button>' +
+        '<button class="msg-act" onclick="rateMsg(this,\'good\')">👍 Helpful</button>' +
+        '<button class="msg-act" onclick="rateMsg(this,\'bad\')">👎 Improve</button>' +
+      '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+var typingEl = null;
+function showTyping(){
+  var msgs = document.getElementById('messages');
+  typingEl = document.createElement('div');
+  typingEl.className = 'typing-row';
+  typingEl.innerHTML =
+    '<div class="msg-av bot">I</div>' +
+    '<div class="typing-bub"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typingEl);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping(){
+  if(typingEl){ typingEl.remove(); typingEl = null; }
+}
+
+function copyMsg(btn){
+  var bub = btn.closest('.msg-content').querySelector('.msg-bub');
+  navigator.clipboard && navigator.clipboard.writeText(bub.innerText);
+  btn.textContent = 'Copied!';
+  setTimeout(function(){ btn.textContent = 'Copy'; }, 2000);
+}
+
+var ratings = {};
+function rateMsg(btn, val){
+  var idx = history.length - 1;
+  ratings['turn_'+Math.floor(idx/2)] = val;
+  btn.style.opacity = '1';
+  btn.style.color = val === 'good' ? '#15803d' : '#dc2626';
+  btn.style.borderColor = val === 'good' ? '#86efac' : '#fca5a5';
+}
+
+function clearChat(){
+  if(history.length === 0) return;
+  if(!confirm('Clear this conversation? This cannot be undone.')) return;
+  history = [];
+  msgCount = 0;
+  updateCount();
+  var msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  // restore empty state
+  var empty = document.createElement('div');
+  empty.className = 'empty-state'; empty.id = 'empty-state';
+  empty.innerHTML = '<div class="empty-icon">🌿</div><h3>Ahlan wa sahlan.</h3><p>Ask me anything about Intense Oud wholesale — catalog, pricing, logistics, onboarding, or why we\'re different. I know it all.</p><div class="chip-row" style="justify-content:center;margin-top:20px;"><button class="chip" onclick="injectQ(\'Tell me about your full catalog and top brands\')">View catalog</button><button class="chip" onclick="injectQ(\'What are your MOQs and pricing tiers?\')">Pricing tiers</button><button class="chip" onclick="injectQ(\'How does onboarding work?\')">Onboarding</button><button class="chip" onclick="injectQ(\'How do you ship and fulfill wholesale orders?\')">Fulfillment</button></div>';
+  msgs.appendChild(empty);
+}
+
+/* ═══════════════════════════════════════
+   TEXT FORMATTING
+═══════════════════════════════════════ */
+function fmt(t){
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n\n/g,'</p><p style="margin-top:10px;">')
+    .replace(/\n/g,'<br>');
+}
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ═══════════════════════════════════════
+   EXPORT — TRAINING DATA
+═══════════════════════════════════════ */
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  renderPreview();
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.etab').forEach(function(b,i){
+    b.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  renderPreview();
+}
+function renderPreview(){
+  var pre = document.getElementById('export-preview');
+  if(history.length === 0){ pre.textContent = '— No messages yet —'; return; }
+  pre.textContent = buildExport(currentTab);
+}
+
+function buildExport(fmt){
+  var turns = [];
+  for(var i=0;i<history.length-1;i+=2){
+    if(history[i] && history[i+1]){
+      turns.push({user: history[i].content, assistant: history[i+1].content});
+    }
+  }
+
+  if(fmt === 'jsonl'){
+    return turns.map(function(t){
+      return JSON.stringify({
+        messages:[
+          {role:'system', content: SYSTEM.slice(0,200)+'... [full system prompt]'},
+          {role:'user',    content: t.user},
+          {role:'assistant',content: t.assistant}
+        ]
+      });
+    }).join('\n');
+  }
+
+  if(fmt === 'json'){
+    return JSON.stringify({
+      session_id: sessionId,
+      started_at: sessionStart.toISOString(),
+      model: 'claude-sonnet-4-20250514',
+      system_prompt_preview: SYSTEM.slice(0,300)+'...',
+      conversation: history,
+      ratings: ratings,
+      exported_at: new Date().toISOString()
+    }, null, 2);
+  }
+
+  if(fmt === 'txt'){
+    return turns.map(function(t,i){
+      return '=== Turn '+(i+1)+' ===\n\nUSER:\n'+t.user+'\n\nASSISTANT:\n'+t.assistant+'\n';
+    }).join('\n');
+  }
+
+  if(fmt === 'csv'){
+    var rows = ['turn,role,content,timestamp'];
+    history.forEach(function(m,i){
+      rows.push([
+        Math.floor(i/2)+1,
+        m.role,
+        '"'+m.content.replace(/"/g,'""')+'"',
+        new Date().toISOString()
+      ].join(','));
+    });
+    return rows.join('\n');
+  }
+}
+
+function downloadExport(){
+  var content = buildExport(currentTab);
+  var ext = {jsonl:'jsonl', json:'json', txt:'txt', csv:'csv'}[currentTab];
+  var mime = {jsonl:'application/jsonlines', json:'application/json', txt:'text/plain', csv:'text/csv'}[currentTab];
+  var blob = new Blob([content], {type: mime});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'intense-oud-training-'+sessionId+'.'+ext;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function quickExport(){
+  if(history.length === 0){ alert('No conversation to export yet.'); return; }
+  downloadExport();
+}
+</script>
+
+</body>
+</html>
